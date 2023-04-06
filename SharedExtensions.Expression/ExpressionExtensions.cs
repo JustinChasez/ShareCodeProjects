@@ -357,11 +357,15 @@ internal static class ExpressionExtensions
 
     private static Expression BuildStringCondition(Expression left, OperatorComparer comparer, Expression right)
     {
-        var compareMethod = typeof(string).GetMethods().First(m => m.Name.Equals(Enum.GetName(typeof(OperatorComparer), comparer)) && m.GetParameters().Count() == 1);
+        var compareMethod = typeof(string).GetMethods()
+                                          .First(m => m.Name.Equals(Enum.GetName(typeof(OperatorComparer), comparer)) && 
+                                                      m.GetParameters().Count() == 1);
+
         //we assume ignoreCase, so call ToLower on paramter and memberexpression
         var toLowerMethod = typeof(string).GetMethods().Single(m => m.Name.Equals("ToLower") && m.GetParameters().Count() == 0);
         left  = Expression.Call(left, toLowerMethod);
         right = Expression.Call(right, toLowerMethod);
+
         return Expression.Call(left, compareMethod, right);
     }
 
