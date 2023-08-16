@@ -50,9 +50,9 @@ internal static class StringExtensions
 
     public static string GenerateRandomCode(int size)
     {
-        var          random  = new Random();
-        const string input   = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwyxz0123456789";
-        var          builder = new StringBuilder();
+        var random = new Random();
+        const string input = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwyxz0123456789";
+        var builder = new StringBuilder();
         for (var i = 0; i < size; i++)
         {
             var ch = input[random.Next(0, input.Length)];
@@ -77,11 +77,35 @@ internal static class StringExtensions
         return slug;
     }
 
+    public static string TitleCaseToHyphenSeparated(this string input)
+    {
+        string output = string.Empty;
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            if (char.IsUpper(input[i]))
+            {
+                if (i > 0 && !char.IsUpper(input[i - 1]))
+                {
+                    output += "-";
+                }
+
+                output += char.ToLower(input[i]);
+            }
+            else
+            {
+                output += input[i];
+            }
+        }
+
+        return output;
+    }
+
 
     public static string RemoveDiacritics(this string name)
     {
         var stFormD = name.Normalize(NormalizationForm.FormD);
-        var sb      = new StringBuilder();
+        var sb = new StringBuilder();
 
         foreach (var t in from t in stFormD
                           let uc = CharUnicodeInfo.GetUnicodeCategory(t)
@@ -132,14 +156,14 @@ internal static class StringExtensions
 
 
     [DebuggerStepThrough]
-    public static bool IsMatch(this string  input, string pattern,
+    public static bool IsMatch(this string input, string pattern,
                                RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline)
     {
         return Regex.IsMatch(input, pattern, options);
     }
 
     [DebuggerStepThrough]
-    public static bool IsMatch(this string  input, string pattern, out Match match,
+    public static bool IsMatch(this string input, string pattern, out Match match,
                                RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline)
     {
         match = Regex.Match(input, pattern, options);
