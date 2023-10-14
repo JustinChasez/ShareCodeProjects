@@ -10,6 +10,11 @@ internal static class AttributeCheckingUtils
         return type != null && type.GetCustomAttribute<TAttribute>() != null;
     }
 
+    public static bool HasAttribute<TAttribute>(this MemberInfo type) where TAttribute : Attribute
+    {
+        return type != null && type.GetCustomAttribute<TAttribute>() != null;
+    }
+
     public static bool HasProperty<TType>(this Type type, string propertyName)
     {
         if (type == null)
@@ -19,10 +24,5 @@ internal static class AttributeCheckingUtils
                            .FirstOrDefault(_ => _.Name == propertyName && _.PropertyType == typeof(TType));
 
         return property != null;
-    }
-
-    public static bool HasAttribute<TAttribute>(this MemberInfo type) where TAttribute : Attribute
-    {
-        return type != null && type.GetCustomAttribute<TAttribute>() != null;
     }
 }
