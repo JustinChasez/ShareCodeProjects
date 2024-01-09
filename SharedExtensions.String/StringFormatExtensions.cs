@@ -6,6 +6,8 @@
  * https://gist.github.com/JustinChasez/b6bdde4511f6b641d2d9969e262b7df8
  ***/
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 // ReSharper disable once CheckNamespace

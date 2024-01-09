@@ -6,6 +6,8 @@
  * https://gist.github.com/JustinChasez/37c7c9ea910c191ff5a15e9fd7ae53ba
  ***/
 
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;
 

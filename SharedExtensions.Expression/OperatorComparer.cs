@@ -1,4 +1,6 @@
-﻿namespace System.Linq.Expressions;
+﻿using System.Collections.Generic;
+
+namespace System.Linq.Expressions;
 
 internal enum OperatorComparer
 {

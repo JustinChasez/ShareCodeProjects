@@ -1,6 +1,12 @@
 ﻿
 
+
+
+using System;
+using System.Collections.Generic;
 // ReSharper disable once CheckNamespace
+using System.Linq;
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 internal static class ServiceCollectionLazySupportExtensions

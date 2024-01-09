@@ -1,6 +1,9 @@
 ﻿
 // ReSharper disable CheckNamespace
 
+using System;
+using System.Collections.Generic;
+
 namespace Microsoft.AspNetCore.Http;
 
 internal static class HttpContextExtensions

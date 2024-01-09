@@ -1,6 +1,9 @@
 ﻿
 
 // ReSharper disable once CheckNamespace
+
+using System.Linq;
+
 namespace System;
 
 internal static class ServiceProviderExtensions
