@@ -334,40 +334,114 @@ internal static class ExpressionExtensions
 
     private static Expression BuildComparision(Expression left, OperatorComparer comparer, Expression right)
     {
-        var mask = new List<OperatorComparer>
+        var stringSupportedOperators = new List<OperatorComparer>
         {
+            OperatorComparer.Equals,
+            OperatorComparer.NotEqual,
             OperatorComparer.Contains,
+            OperatorComparer.NotContains,
             OperatorComparer.StartsWith,
-            OperatorComparer.EndsWith
+            OperatorComparer.NotStartsWith,
+            OperatorComparer.EndsWith,
+            OperatorComparer.NotEndsWith,
+            OperatorComparer.In,
+            OperatorComparer.NotIn
         };
 
-        if (mask.Contains(comparer) &&
-            left.Type != typeof(string))
+        if (left.Type != typeof(string))
         {
-            comparer = OperatorComparer.Equals;
-        }
+            //if (comparer == OperatorComparer.In ||
+            //    comparer == OperatorComparer.NotIn)
+                return BuildCondition(left, comparer, right, left.Type);
 
-        if (!mask.Contains(comparer))
-        {
             return Expression.MakeBinary((ExpressionType) comparer, left, Expression.Convert(right, left.Type));
         }
+
+        //if (left.Type == typeof(Guid))
+        //{
+        //    if (!guidSupportedOperators.Contains(comparer))
+        //    {
+        //        comparer = OperatorComparer.Equals;
+        //    }
+
+        //    return BuildGuidCondition(left, comparer, right);
+        //}
 
         return BuildStringCondition(left, comparer, right);
     }
 
-    private static Expression BuildStringCondition(Expression left, OperatorComparer comparer, Expression right)
+    private static Expression BuildStringCondition(Expression left, OperatorComparer inputComparer, Expression right)
     {
-        var compareMethod = typeof(string).GetMethods()
-                                          .First(m => m.Name.Equals(Enum.GetName(typeof(OperatorComparer), comparer)) && 
+        MethodInfo compareMethod;
+
+        var comparer = Enum.GetName(typeof(OperatorComparer), inputComparer)!
+                           .Replace("Not", "")
+                           .ToCompareOperator();
+
+        bool needNotOperator = Enum.GetName(typeof(OperatorComparer), inputComparer)!
+                                   .StartsWith("Not");
+
+        var toLowerMethod = typeof(string).GetMethods()
+                                          .Single(m => m.Name.Equals("ToLower") && !m.GetParameters().Any());
+
+        left = Expression.Call(left, toLowerMethod);
+
+        Expression operatorAppliedExpression;
+
+        if (comparer == OperatorComparer.In)
+        {
+            compareMethod = typeof(List<string>).GetMethods()
+                                                .First(m => m.Name.Equals("Contains") &&
+                                                            m.GetParameters().Count() == 1);
+
+            operatorAppliedExpression = Expression.Call(right, compareMethod, left);
+        }
+        else
+        {
+
+            compareMethod = typeof(string).GetMethods()
+                                          .First(m => m.Name.Equals(Enum.GetName(typeof(OperatorComparer), comparer)) &&
                                                       m.GetParameters().Count() == 1);
 
-        //we assume ignoreCase, so call ToLower on paramter and memberexpression
-        var toLowerMethod = typeof(string).GetMethods().Single(m => m.Name.Equals("ToLower") && m.GetParameters().Count() == 0);
-        left  = Expression.Call(left, toLowerMethod);
-        right = Expression.Call(right, toLowerMethod);
+            right = Expression.Call(right, toLowerMethod);
 
-        return Expression.Call(left, compareMethod, right);
+            operatorAppliedExpression = Expression.Call(left, compareMethod, right);
+        }
+
+        return needNotOperator ? Expression.Not(operatorAppliedExpression) : operatorAppliedExpression;
     }
+
+    private static Expression BuildCondition(Expression       left,
+                                             OperatorComparer inputComparer,
+                                             Expression       right,
+                                             Type             targetType)
+    {
+        MethodInfo compareMethod;
+
+        var comparer = Enum.GetName(typeof(OperatorComparer), inputComparer)!
+                           .Replace("Not", "")
+                           .ToCompareOperator();
+
+        bool needNotOperator = Enum.GetName(typeof(OperatorComparer), inputComparer)!
+                                   .StartsWith("Not");
+
+        Expression operatorAppliedExpression;
+
+        if (comparer == OperatorComparer.In)
+        {
+            compareMethod = typeof(List<>).MakeGenericType(targetType).GetMethod("Contains")!;
+
+            operatorAppliedExpression = Expression.Call(right, compareMethod, left);
+        }
+        else
+        {
+            operatorAppliedExpression =
+                Expression.MakeBinary((ExpressionType)comparer, left, Expression.Convert(right, left.Type));
+        }
+
+        return needNotOperator ? Expression.Not(operatorAppliedExpression) : operatorAppliedExpression;
+    }
+
 
     private static Expression MakeLambda(Expression parameter, Expression predicate)
     {
