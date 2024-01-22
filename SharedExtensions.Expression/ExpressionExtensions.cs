@@ -330,6 +330,19 @@ internal static class ExpressionExtensions
         var right         = Expression.Constant(value);
         var predicate     = BuildComparision(left, comparer, right);
         return MakeLambda(parameter, predicate);
+    } 
+    
+    private static PropertyInfo GetProperty(Type type, string propName)
+    {
+        PropertyInfo prop = type.GetProperty(propName);
+
+        if (prop == null)
+        {
+            var csConventionName = propName[0].ToString().ToUpper() + propName.Substring(1);
+            prop = type.GetProperty(csConventionName);
+        }
+
+        return prop;
     }
 
     private static Expression BuildComparision(Expression left, OperatorComparer comparer, Expression right)

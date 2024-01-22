@@ -115,19 +115,21 @@ internal static class XmlDocumentationExtensions
     }
 
     /// <summary>
-    /// Returns the XML documentation (summary tag) for the specified member.
+    ///     Returns the XML documentation (summary tag) for the specified member.
     /// </summary>
     /// <param name="member">The reflected member.</param>
     /// <returns>The contents of the summary tag for the member.</returns>
-    public static string GetXmlDocumentation(this MemberInfo member) => GetXmlDocumentation(member, member.Module.Assembly.GetName().Name + ".xml");
+    public static string GetXmlDocumentation(this MemberInfo member) 
+        => GetXmlDocumentation(member, member.Module.Assembly.GetName().Name + ".xml");
 
     /// <summary>
-    /// Returns the XML documentation (summary tag) for the specified member.
+    ///     Returns the XML documentation (summary tag) for the specified member.
     /// </summary>
     /// <param name="member">The reflected member.</param>
     /// <param name="pathToXmlFile">Path to the XML documentation file.</param>
     /// <returns>The contents of the summary tag for the member.</returns>
-    public static string GetXmlDocumentation(this MemberInfo member, string pathToXmlFile) => GetXmlDocumentation(member, GetDocument(member.Module.Assembly, pathToXmlFile));
+    public static string GetXmlDocumentation(this MemberInfo member, string pathToXmlFile) 
+        => GetXmlDocumentation(member, GetDocument(member.Module.Assembly, pathToXmlFile));
 
     /// <summary>
     /// Returns the XML documentation (summary tag) for the specified member.
@@ -135,7 +137,11 @@ internal static class XmlDocumentationExtensions
     /// <param name="member">The reflected member.</param>
     /// <param name="xml">XML documentation.</param>
     /// <returns>The contents of the summary tag for the member.</returns>
-    public static string GetXmlDocumentation(this MemberInfo member, XDocument xml) => xml?.XPathEvaluate(string.Format("string(/doc/members/member[@name='{0}']/summary)", GetMemberElementName(member))).ToString().Trim().NullIfEmpty();
+    public static string GetXmlDocumentation(this MemberInfo member, XDocument xml)
+        => xml?.XPathEvaluate($"string(/doc/members/member[@name='{GetMemberElementName(member)}']/summary)")
+               .ToString()
+              ?.Trim()
+               .NullIfEmpty();
 
     /// <summary>
     /// Returns the XML documentation (returns/param tag) for the specified parameter.
