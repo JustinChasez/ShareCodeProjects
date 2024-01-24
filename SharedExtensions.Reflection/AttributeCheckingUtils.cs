@@ -10,6 +10,20 @@ internal static class AttributeCheckingUtils
         return type != null && type.GetCustomAttribute<TAttribute>() != null;
     }
 
+    public static bool HasAttribute<TAttribute>(this Type type, out TAttribute attribute) where TAttribute : Attribute
+    {
+        attribute = null;
+
+        var customAttribute = type?.GetCustomAttribute<TAttribute>();
+
+        if (customAttribute != null)
+        {
+            attribute = customAttribute;
+        }
+
+        return customAttribute != null;
+    }
+
     public static bool HasAttribute<TAttribute>(this MemberInfo type) where TAttribute : Attribute
     {
         return type != null && type.GetCustomAttribute<TAttribute>() != null;
