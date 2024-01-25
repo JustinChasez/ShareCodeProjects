@@ -117,6 +117,9 @@ internal static class ExpressionExtensions
         return expression;
     }
 
+    public static Expression<Func<T, object>> ToMemberAccessExpression<T>(this string fieldName) where T : class
+        => BuildMemberAccessExpression<T>(fieldName);
+
     public static Expression<Func<T, object>> BuildMemberAccessExpression<T>(string fieldName) where T : class
     {
         var type      = typeof(T);
@@ -258,6 +261,50 @@ internal static class ExpressionExtensions
     public static Expression<Func<T, bool>> BuildPredicate<T>(object           value, 
                                                               OperatorComparer comparer, 
                                                               string           propertiesPath)
+    {
+        var parameterExpression = Expression.Parameter(typeof(T), typeof(T).Name);
+
+        var properties = propertiesPath.Split(new[]
+                                              {
+                                                  "."
+                                              },
+                                              StringSplitOptions.RemoveEmptyEntries);
+
+        return (Expression<Func<T, bool>>)BuildNavigationExpression(parameterExpression, comparer, value, properties);
+    }
+
+    /// <summary>
+    ///     Build the predicate expression that can be translated
+    ///     to read like <typeparamref name="T"/>.[<seealso cref="propertiesPath"/>] = <seealso cref="value"/>
+    /// </summary>
+    /// <typeparam name="T">The type of the target entity</typeparam>
+    /// <param name="propertiesPath">
+    ///     The path to the property to do the compare operation
+    /// </param>
+    /// <param name="value">
+    ///     The other operand of the operation
+    /// </param>
+    /// <returns></returns>
+    public static Expression<Func<T, bool>> EqualsTo<T>(this string propertiesPath,
+                                                        object      value) =>
+        BuildPredicate<T>(propertiesPath, OperatorComparer.Equals, value);
+
+    /// <summary>
+    ///     Builds the predicate expression that can be translated
+    ///     to read like <typeparamref name="T"/>.<seealso cref="propertiesPath"/> {comparer} {value}
+    /// </summary>
+    /// <typeparam name="T">The type of the target entity</typeparam>
+    /// <param name="propertiesPath">
+    ///     The path to the property to do the compare operation
+    /// </param>
+    /// <param name="comparer">The compare operation</param>
+    /// <param name="value">
+    ///     The other operand of the operation
+    /// </param>
+    /// <returns></returns>
+    public static Expression<Func<T, bool>> BuildPredicate<T>(this string      propertiesPath,
+                                                              OperatorComparer comparer,
+                                                              object           value)
     {
         var parameterExpression = Expression.Parameter(typeof(T), typeof(T).Name);
 
