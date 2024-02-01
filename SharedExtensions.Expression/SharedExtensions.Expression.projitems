@@ -12,5 +12,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ExpressionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OperatorComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PredicateBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnknownPropertyException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
   </ItemGroup>
 </Project>

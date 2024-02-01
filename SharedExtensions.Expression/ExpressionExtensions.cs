@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
+using DotNetBrightener.Framework.Exceptions;
 
 namespace System.Linq.Expressions;
 
@@ -23,22 +24,19 @@ internal static class ExpressionExtensions
     }
 
 
-    private static PropertyInfo MatchSimplePropertyAccess(
-        this Expression parameterExpression, Expression propertyAccessExpression)
+    private static PropertyInfo MatchSimplePropertyAccess(this Expression parameterExpression,
+                                                          Expression      propertyAccessExpression)
     {
         var propertyPath = MatchPropertyAccess(parameterExpression, propertyAccessExpression).ToArray();
 
-        return propertyPath != null && propertyPath.Count() == 1 ? propertyPath.FirstOrDefault() : null;
+        return propertyPath.Length == 1 ? propertyPath[0] : null;
     }
 
-    private static IEnumerable<PropertyInfo> MatchPropertyAccessList(
-        this LambdaExpression lambdaExpression, Func<Expression, Expression, PropertyInfo> propertyMatcher)
+    private static IEnumerable<PropertyInfo> MatchPropertyAccessList(this LambdaExpression lambdaExpression,
+                                                                     Func<Expression, Expression, PropertyInfo>
+                                                                         propertyMatcher)
     {
-
-        var newExpression
-            = RemoveConvert(lambdaExpression.Body) as NewExpression;
-
-        if (newExpression != null)
+        if (RemoveConvert(lambdaExpression.Body) is NewExpression newExpression)
         {
             var parameterExpression
                 = lambdaExpression.Parameters.Single();
@@ -46,10 +44,10 @@ internal static class ExpressionExtensions
             var propertyPaths
                 = newExpression.Arguments
                                .Select(a => propertyMatcher(a, parameterExpression))
-                               .Where(p => p != null);
+                               .Where(p => p != null)
+                               .ToArray();
 
-            if (propertyPaths.Count()
-             == newExpression.Arguments.Count())
+            if (propertyPaths.Length == newExpression.Arguments.Count)
             {
                 return newExpression.HasDefaultMembersOnly(propertyPaths) ? propertyPaths : null;
             }
@@ -57,19 +55,25 @@ internal static class ExpressionExtensions
 
         var propertyPath = propertyMatcher(lambdaExpression.Body, lambdaExpression.Parameters.Single());
 
-        return (propertyPath != null) ? new[] { propertyPath } : null;
+        return (propertyPath != null)
+                   ? new[]
+                   {
+                       propertyPath
+                   }
+                   : null;
     }
 
 
-
-    private static bool HasDefaultMembersOnly(
-        this NewExpression newExpression, IEnumerable<PropertyInfo> propertyPaths)
+    private static bool HasDefaultMembersOnly(this NewExpression        newExpression,
+                                              IEnumerable<PropertyInfo> propertyPaths)
     {
-        return !newExpression.Members
+        return newExpression?.Members?
                              .Where(
                                     (t, i) =>
-                                        !string.Equals(t.Name, propertyPaths.ElementAt(i).Name, StringComparison.Ordinal))
-                             .Any();
+                                        !string.Equals(t.Name,
+                                                       propertyPaths.ElementAt(i).Name,
+                                                       StringComparison.Ordinal))
+                             .Any() == false;
     }
 
     public static IEnumerable<PropertyInfo> MatchPropertyAccess(
@@ -86,14 +90,14 @@ internal static class ExpressionExtensions
 
             if (memberExpression == null)
             {
-                return null;
+                return Array.Empty<PropertyInfo>();
             }
 
             var propertyInfo = memberExpression.Member as PropertyInfo;
 
             if (propertyInfo == null)
             {
-                return null;
+                return Array.Empty<PropertyInfo>();
             }
 
             propertyInfos.Insert(0, propertyInfo);
@@ -124,6 +128,7 @@ internal static class ExpressionExtensions
     {
         var type      = typeof(T);
         var fieldInfo = type.GetMember(fieldName).FirstOrDefault();
+
         if (fieldInfo == null)
         {
             fieldName = fieldName.First().ToString().ToUpper() + fieldName.Substring(1);
@@ -132,7 +137,7 @@ internal static class ExpressionExtensions
         }
 
         if (fieldInfo == null || !(fieldInfo is PropertyInfo propertyInfo))
-            throw new InvalidOperationException($"Unknown field '{fieldName}' of type {type.FullName}");
+            throw new UnknownPropertyException(fieldName, type);
 
         var        paramExpression = Expression.Parameter(type, "_");
         Expression memberAccess    = Expression.MakeMemberAccess(paramExpression, propertyInfo);
@@ -196,7 +201,7 @@ internal static class ExpressionExtensions
         }
 
         if (fieldInfo == null || !(fieldInfo is PropertyInfo propertyInfo))
-            throw new InvalidOperationException($"Unknown field '{fieldName}' of type {type.FullName}");
+            throw new UnknownPropertyException(fieldName, type);
 
         var        paramExpression = Expression.Parameter(type, paramName);
         Expression memberAccess    = Expression.MakeMemberAccess(paramExpression, propertyInfo);
@@ -229,7 +234,7 @@ internal static class ExpressionExtensions
         if (properties == null ||
             !properties.Any())
         {
-            throw new InvalidOperationException("Properties must be provided");
+            throw new ArgumentNullException(nameof(properties), "Properties must be provided");
         }
 
         var source = Expression.Parameter(typeof(T), "o");
