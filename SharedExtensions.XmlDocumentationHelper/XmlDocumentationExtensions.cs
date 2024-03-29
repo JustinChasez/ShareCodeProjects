@@ -31,7 +31,17 @@ internal static class XmlDocumentationExtensions
     }
 
     /// <summary>
-    /// Returns the expected name for a member element in the XML documentation file.
+    ///     Returns the expected name for a member element in the XML documentation file.
+    /// </summary>
+    /// <param name="member">The reflected member.</param>
+    /// <returns>The name of the member element.</returns>
+    private static string GetTypeElementName(Type member)
+    {
+        return $"T:{member.FullName}";
+    }
+
+    /// <summary>
+    ///     Returns the expected name for a member element in the XML documentation file.
     /// </summary>
     /// <param name="member">The reflected member.</param>
     /// <returns>The name of the member element.</returns>
@@ -123,6 +133,25 @@ internal static class XmlDocumentationExtensions
         => GetXmlDocumentation(member, member.Module.Assembly.GetName().Name + ".xml");
 
     /// <summary>
+    ///     Returns the XML documentation (remarks tag) for the specified member.
+    /// </summary>
+    /// <param name="member">The reflected member.</param>
+    /// <returns>The contents of the summary tag for the member.</returns>
+    public static string GetXmlDocumentationRemarks(this MemberInfo member) 
+        => GetXmlDocumentationRemarks(member, member.Module.Assembly.GetName().Name + ".xml");
+
+
+    /// <summary>
+    ///     Returns the XML documentation (summary tag) for the specified member.
+    /// </summary>
+    /// <param name="member">The reflected member.</param>
+    /// <param name="pathToXmlFile">Path to the XML documentation file.</param>
+    /// <returns>The contents of the summary tag for the member.</returns>
+    public static string GetXmlDocumentationRemarks(this MemberInfo member, string pathToXmlFile) 
+        => GetXmlDocumentationRemarks(member, GetDocument(member.Module.Assembly, pathToXmlFile));
+
+
+    /// <summary>
     ///     Returns the XML documentation (summary tag) for the specified member.
     /// </summary>
     /// <param name="member">The reflected member.</param>
@@ -144,14 +173,38 @@ internal static class XmlDocumentationExtensions
                .NullIfEmpty();
 
     /// <summary>
-    /// Returns the XML documentation (returns/param tag) for the specified parameter.
+    ///     Returns the XML documentation (summary tag) for the specified type.
+    /// </summary> 
+    /// <param name="member">The reflected member.</param>
+    /// <param name="xml">XML documentation.</param>
+    /// <returns>The contents of the summary tag for the member.</returns>
+    public static string GetXmlDocumentation(this Type member, XDocument xml)
+        => xml?.XPathEvaluate($"string(/doc/members/member[@name='{GetTypeElementName(member)}']/summary)")
+               .ToString()
+              ?.Trim()
+               .NullIfEmpty();
+
+    /// <summary>
+    ///     Returns the XML documentation (remarks tag) for the specified type.
+    /// </summary> 
+    /// <param name="member">The reflected member.</param>
+    /// <param name="xml">XML documentation.</param>
+    /// <returns>The contents of the summary tag for the member.</returns>
+    public static string GetXmlDocumentationRemarks(this MemberInfo member, XDocument xml)
+        => xml?.XPathEvaluate($"string(/doc/members/member[@name='{GetMemberElementName(member)}']/remarks)")
+               .ToString()
+              ?.Trim()
+               .NullIfEmpty();
+
+    /// <summary>
+    ///     Returns the XML documentation (returns/param tag) for the specified parameter.
     /// </summary>
     /// <param name="parameter">The reflected parameter (or return value).</param>
     /// <returns>The contents of the returns/param tag for the parameter.</returns>
     public static string GetXmlDocumentation(this ParameterInfo parameter) => GetXmlDocumentation(parameter, parameter.Member.Module.Assembly.GetName().Name + ".xml");
 
     /// <summary>
-    /// Returns the XML documentation (returns/param tag) for the specified parameter.
+    ///     Returns the XML documentation (returns/param tag) for the specified parameter.
     /// </summary>
     /// <param name="parameter">The reflected parameter (or return value).</param>
     /// <param name="pathToXmlFile">Path to the XML documentation file.</param>
@@ -159,7 +212,7 @@ internal static class XmlDocumentationExtensions
     public static string GetXmlDocumentation(this ParameterInfo parameter, string pathToXmlFile) => GetXmlDocumentation(parameter, GetDocument(parameter.Member.Module.Assembly, pathToXmlFile));
 
     /// <summary>
-    /// Returns the XML documentation (returns/param tag) for the specified parameter.
+    ///     Returns the XML documentation (returns/param tag) for the specified parameter.
     /// </summary>
     /// <param name="parameter">The reflected parameter (or return value).</param>
     /// <param name="xml">XML documentation.</param>

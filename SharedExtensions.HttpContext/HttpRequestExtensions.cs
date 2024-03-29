@@ -28,8 +28,8 @@ internal static class HttpRequestExtensions
     {
         var requestUrl = request.GetDisplayUrl();
 
-        var uri  = new UriBuilder(requestUrl);
-        
+        var uri = new UriBuilder(requestUrl);
+
         if (request.Headers.ContainsKey("X-Forwarded-Proto"))
         {
             request.Headers.TryGetValue("X-Forwarded-Proto", out var proto);
@@ -37,7 +37,20 @@ internal static class HttpRequestExtensions
             uri.Port   = uri.Scheme == "http" ? 80 : 443;
         }
 
-        requestUrl = new Uri(uri.ToString()).GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port,
+        UriComponents uriComponents = UriComponents.Scheme | UriComponents.UserInfo | UriComponents.Host |
+                                      UriComponents.Port | UriComponents.Path | UriComponents.Query |
+                                      UriComponents.Fragment;
+
+        // Check if the port is not the standard HTTP (80) or HTTPS (443) ports
+        if (uri.Port != 80 &&
+            uri.Port != 443)
+        {
+            // Include the port in the components
+            uriComponents |= UriComponents.StrongPort;
+        }
+
+
+        requestUrl = new Uri(uri.ToString()).GetComponents(uriComponents,
                                                            UriFormat.UriEscaped);
 
         return requestUrl;
