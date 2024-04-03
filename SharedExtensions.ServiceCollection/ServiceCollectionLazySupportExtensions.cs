@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-// ReSharper disable once CheckNamespace
-using System.Linq;
+﻿// ReSharper disable once CheckNamespace
 
 namespace Microsoft.Extensions.DependencyInjection;
 

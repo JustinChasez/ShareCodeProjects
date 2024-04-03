@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DotNetBrightener.Extensions.ProblemsResult.UI;
+﻿namespace DotNetBrightener.Extensions.ProblemsResult.UI;
 
 internal interface IUIResourcesReader
 {
