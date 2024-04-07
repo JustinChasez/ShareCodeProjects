@@ -47,9 +47,15 @@ internal static class ReflectionExtensions
         return recursiveList;
     }
 
+    /// <summary>
+    ///     Skips the assemblies are usually system assemblies for from third-party libraries
+    /// </summary>
+    /// <param name="assemblies"></param>
+    /// <returns></returns>
     public static IEnumerable<Assembly> FilterSkippedAssemblies(this IEnumerable<Assembly> assemblies)
     {
-        return assemblies.Where(x => !x.FullName.IsMatch(AssemblySkipLoadingPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled));
+        return assemblies.Where(x => !x.FullName.IsMatch(AssemblySkipLoadingPattern,
+                                                         RegexOptions.IgnoreCase | RegexOptions.Compiled));
     }
 
     public static bool IsNotSystemType(this Type type)
