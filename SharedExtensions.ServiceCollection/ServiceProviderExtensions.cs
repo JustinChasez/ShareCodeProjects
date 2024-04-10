@@ -4,10 +4,6 @@ namespace System;
 
 internal static class ServiceProviderExtensions
 {
-    [Obsolete("Use TryGet() method instead")]
-    public static TService TryGetService<TService>(this IServiceProvider provider) where TService : class =>
-        TryGet<TService>(provider);
-
     public static TService TryGet<TService>(this IServiceProvider provider) where TService : class
     {
         if (TryGet(provider, typeof(TService)) is TService tServiceInstance)
@@ -15,9 +11,6 @@ internal static class ServiceProviderExtensions
 
         return default;
     }
-
-    [Obsolete("Use TryGet() method instead")]
-    public static object TryGetService(this IServiceProvider provider, Type type) => TryGet(provider, type);
 
     public static object TryGet(this IServiceProvider provider, Type type)
     {
