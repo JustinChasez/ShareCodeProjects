@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace System;
@@ -35,7 +36,8 @@ internal static class ReflectionExtensions
         {
             recursiveList.Add($"{name}.{property.Name}".Trim('.'));
 
-            if (property.PropertyType.IsClass && property.PropertyType.IsNotSystemType())
+            if (property.PropertyType.IsClass &&
+                property.PropertyType.IsNotSystemType())
             {
                 GetAvailableFieldNames(property.PropertyType,
                                        $"{name}.{property.Name}".Trim('.'),
@@ -54,16 +56,34 @@ internal static class ReflectionExtensions
     /// <returns></returns>
     public static IEnumerable<Assembly> FilterSkippedAssemblies(this IEnumerable<Assembly> assemblies)
     {
-        return assemblies.Where(x => !x.FullName.IsMatch(AssemblySkipLoadingPattern,
-                                                         RegexOptions.IgnoreCase | RegexOptions.Compiled));
+        return assemblies.Where(x => !IsMatch(x.FullName,
+                                              AssemblySkipLoadingPattern,
+                                              RegexOptions.IgnoreCase | RegexOptions.Compiled));
     }
 
     public static bool IsNotSystemType(this Type type)
     {
-        return type.Namespace == null || (!type.Namespace.IsMatch(AssemblySkipLoadingPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled));
+        return type.Namespace == null || !IsMatch(type.Namespace,
+                                                  AssemblySkipLoadingPattern,
+                                                  RegexOptions.IgnoreCase | RegexOptions.Compiled);
     }
 
-    private static List<Type> GetDerivedTypes(this IEnumerable<Assembly> bundledAssemblies, Type t)
+    public static Type[] GetDerivedTypes<TParent>(this IEnumerable<Assembly> assemblies)
+    {
+        return GetDerivedTypes(assemblies, typeof(TParent)).ToArray();
+    }
+
+    public static Type[] GetDerivedTypes<TParent>(this Assembly assembly)
+    {
+        return GetDerivedTypes(new[]
+                               {
+                                   assembly
+                               },
+                               typeof(TParent))
+           .ToArray();
+    }
+
+    public static List<Type> GetDerivedTypes(this IEnumerable<Assembly> bundledAssemblies, Type t)
     {
         var result = new List<Type>();
 
@@ -86,7 +106,8 @@ internal static class ReflectionExtensions
                 {
                     if ((t.IsAssignableFrom(type) ||
                          type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == t)) &&
-                        !type.IsAbstract && !type.IsInterface)
+                        !type.IsAbstract &&
+                        !type.IsInterface)
                     {
                         result.Add(type);
                     }
@@ -99,9 +120,30 @@ internal static class ReflectionExtensions
 
         return result;
     }
-	
+
     public static bool IsNullable(this Type type)
     {
         return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+    }
+
+
+
+    [DebuggerStepThrough]
+    private static bool IsMatch(this string  input,
+                                string       pattern,
+                                RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline)
+    {
+        return Regex.IsMatch(input, pattern, options);
+    }
+
+    [DebuggerStepThrough]
+    private static bool IsMatch(this string  input,
+                                string       pattern,
+                                out Match    match,
+                                RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline)
+    {
+        match = Regex.Match(input, pattern, options);
+
+        return match.Success;
     }
 }
