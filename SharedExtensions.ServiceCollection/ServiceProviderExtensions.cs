@@ -25,7 +25,12 @@ internal static class ServiceProviderExtensions
 
         try
         {
-            return provider.GetService(type);
+            var instance = provider.GetService(type);
+
+            if (instance != null)
+                return instance;
+
+            return Activator.CreateInstance(type);
         }
         catch
         {
