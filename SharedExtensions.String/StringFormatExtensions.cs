@@ -8,7 +8,7 @@
 
 using System.Text.RegularExpressions;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 namespace System;
 
 internal static class StringFormatExtensions

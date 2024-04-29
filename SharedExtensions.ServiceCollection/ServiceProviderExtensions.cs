@@ -27,7 +27,7 @@ internal static class ServiceProviderExtensions
         {
             var instance = provider.GetService(type);
 
-            if (instance != null)
+            if (instance is not null)
                 return instance;
 
             return Activator.CreateInstance(type);
@@ -42,12 +42,9 @@ internal static class ServiceProviderExtensions
                     var parameters = constructor.GetParameters()
                                                 .Select(parameter =>
                                                  {
-                                                     var service = provider.GetService(parameter.ParameterType);
+                                                     var service = provider.TryGet(parameter.ParameterType);
 
-                                                     if (service == null)
-                                                         throw new Exception("Unknown dependency");
-
-                                                     return service;
+                                                     return service ?? throw new Exception("Unknown dependency");
                                                  });
 
                     // all is ok, so create instance
