@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>543d648c-1d83-44fc-b2ee-0fe9043a5393</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SharedExtensions.DbContext</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AutoMigrateDbContextAtStartup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbContextMigrationHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MigrateDbContextAtStartup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceCollectionExtensions.cs" />
+  </ItemGroup>
+</Project>
