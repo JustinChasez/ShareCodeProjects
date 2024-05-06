@@ -5,8 +5,8 @@ namespace System.Threading;
 internal static class ParallelExtensions
 {
     public static Task ParallelForEachAsync<T>(this IEnumerable<T> source,
-                                               int                 degreeOfParallelism,
-                                               Func<T, Task>       body)
+                                               Func<T, Task>       body,
+                                               int                 degreeOfParallelism = 2)
     {
         async Task AwaitPartition(IEnumerator<T> partition)
         {
