@@ -97,15 +97,17 @@ internal static class ReflectionExtensions
             }
             catch (ReflectionTypeLoadException exception)
             {
-                types = exception.Types;
+                types = exception.Types
+                                 .Where(_ => _ is not null)
+                                 .ToArray();
             }
 
-            foreach (Type type in types)
+            foreach (Type type in types.Where(t => t is not null))
             {
                 try
                 {
                     if ((t.IsAssignableFrom(type) ||
-                         type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == t)) &&
+                         type!.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == t)) &&
                         !type.IsAbstract &&
                         !type.IsInterface)
                     {
