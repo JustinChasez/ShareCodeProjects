@@ -10,6 +10,7 @@ internal static class JsonSerializerSettings
         PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
         DictionaryKeyPolicy    = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        ReferenceHandler       = ReferenceHandler.IgnoreCycles
     };
 
     public static JsonSerializerOptions DeserializeOptions => new()

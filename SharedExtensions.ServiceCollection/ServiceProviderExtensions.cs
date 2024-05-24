@@ -4,7 +4,7 @@ namespace System;
 
 internal static class ServiceProviderExtensions
 {
-    public static TService TryGet<TService>(this IServiceProvider provider) where TService : class
+    public static TService? TryGet<TService>(this IServiceProvider provider) where TService : class
     {
         if (TryGet(provider, typeof(TService)) is TService tServiceInstance)
             return tServiceInstance;
