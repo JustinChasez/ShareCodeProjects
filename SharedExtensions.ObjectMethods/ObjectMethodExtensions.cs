@@ -11,10 +11,13 @@ internal static class ObjectMethodExtensions
     /// <param name="type"></param>
     /// <param name="methodName"></param>
     /// <returns></returns>
-    public static MethodInfo GetMethodWithName(this Type type, string methodName)
+    public static MethodInfo GetMethodWithName(this Type type, string methodName, params Type[] parameterTypes)
     {
         return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                   .FirstOrDefault(_ => _.Name.Equals(methodName));
+                   .FirstOrDefault(method => method.Name.Equals(methodName) && (!parameterTypes.Any() ||
+                                                                                method.GetParameters()
+                                                                                      .Select(_ => _.ParameterType)
+                                                                                      .All(parameterTypes.Contains)));
     }
 
     /// <summary>
@@ -24,9 +27,9 @@ internal static class ObjectMethodExtensions
     /// <param name="obj"></param>
     /// <param name="methodName"></param>
     /// <returns></returns>
-    public static MethodInfo GetMethodWithName<T>(this T obj, string methodName)
+    public static MethodInfo GetMethodWithName<T>(this T obj, string methodName, params Type[] parameterTypes)
     {
-        return obj.GetType().GetMethodWithName(methodName);
+        return obj.GetType().GetMethodWithName(methodName, parameterTypes);
     }
 
 }

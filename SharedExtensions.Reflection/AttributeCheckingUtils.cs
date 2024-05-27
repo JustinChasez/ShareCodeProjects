@@ -1,14 +1,17 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace System;
 
 internal static class AttributeCheckingUtils
 {
+    [DebuggerStepThrough]
     public static bool HasAttribute<TAttribute>(this Type type) where TAttribute : Attribute
     {
         return type != null && type.GetCustomAttribute<TAttribute>() != null;
     }
 
+    [DebuggerStepThrough]
     public static bool HasAttribute<TAttribute>(this Type type, out TAttribute attribute) where TAttribute : Attribute
     {
         attribute = null;
@@ -23,11 +26,13 @@ internal static class AttributeCheckingUtils
         return customAttribute != null;
     }
 
+    [DebuggerStepThrough]
     public static bool HasAttribute<TAttribute>(this MemberInfo type) where TAttribute : Attribute
     {
         return type != null && type.GetCustomAttribute<TAttribute>() != null;
     }
 
+    [DebuggerStepThrough]
     public static bool HasProperty<TType>(this Type type, string propertyName)
     {
         if (type == null)
