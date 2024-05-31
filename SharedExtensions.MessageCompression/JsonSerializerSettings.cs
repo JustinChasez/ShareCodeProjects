@@ -5,7 +5,7 @@ namespace DotNetBrightener.Utils.MessageCompression;
 
 internal static class JsonSerializerSettings
 {
-    public static JsonSerializerOptions SerializeOptions => new()
+    public static readonly JsonSerializerOptions SerializeOptions = new()
     {
         PropertyNamingPolicy   = JsonNamingPolicy.CamelCase,
         DictionaryKeyPolicy    = JsonNamingPolicy.CamelCase,
@@ -13,7 +13,7 @@ internal static class JsonSerializerSettings
         ReferenceHandler       = ReferenceHandler.IgnoreCycles
     };
 
-    public static JsonSerializerOptions DeserializeOptions => new()
+    public static readonly JsonSerializerOptions DeserializeOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         DefaultIgnoreCondition      = JsonIgnoreCondition.WhenWritingNull
