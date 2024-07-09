@@ -9,6 +9,9 @@
     <Import_RootNamespace>SharedExtensions.DbContext</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DataSeedingStartupTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbContextSeedingStartupTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AutoMigrateDbContextAfterAppStarted.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AutoMigrateDbContextAtStartup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DbContextMigrationHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MigrateDbContextAtStartup.cs" />

@@ -19,26 +19,3 @@ internal class AutoMigrateDbContextAtStartup<TDbContext>(
         return true;
     }
 }
-
-internal class AutoMigrateDbContextAfterAppStarted<TDbContext>(
-    IServiceScopeFactory                           serviceScopeFactory,
-    IHostApplicationLifetime                       lifetime,
-    ILogger<MigrateDbContextAtStartup<TDbContext>> logger)
-    : MigrateDbContextAtStartup<TDbContext>(serviceScopeFactory, logger)
-    where TDbContext : DbContext
-{
-    protected override bool ShouldRun()
-    {
-        return true;
-    }
-
-    public override Task StartAsync(CancellationToken cancellationToken)
-    {
-        if (ShouldRun())
-        {
-            lifetime.ApplicationStarted.Register(PerformMigration);
-        }
-
-        return Task.CompletedTask;
-    }
-}
