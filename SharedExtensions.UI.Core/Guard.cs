@@ -20,10 +20,11 @@
 // 
 //       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace DotNetBrightener.Extensions.ProblemsResult.UI;
+namespace System;
 
 internal static class Guard
 {

@@ -13,9 +13,9 @@ internal static class ServiceProviderExtensions
         return default;
     }
 
-    public static object TryGet(this IServiceProvider provider, Type type)
+    public static object? TryGet(this IServiceProvider provider, Type type)
     {
-        Exception innerException = null;
+        Exception? innerException = null;
 
         if (type.IsInterface)
         {
