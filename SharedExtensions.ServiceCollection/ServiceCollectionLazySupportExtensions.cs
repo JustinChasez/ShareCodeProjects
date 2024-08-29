@@ -17,7 +17,7 @@ internal static class ServiceCollectionLazySupportExtensions
             {
                 var lazyType = typeof(Lazy<>).MakeGenericType(service.ServiceType);
 
-                var existingService = serviceCollection.FirstOrDefault(_ => _.ServiceType == lazyType);
+                var existingService = serviceCollection.FirstOrDefault(d => d.ServiceType == lazyType);
                 if (existingService != null)
                 {
                     serviceCollection.Remove(existingService);
@@ -34,7 +34,7 @@ internal static class ServiceCollectionLazySupportExtensions
                 var enumerableOfType = typeof(IEnumerable<>).MakeGenericType(service.ServiceType);
                 var lazyType         = typeof(Lazy<>).MakeGenericType(enumerableOfType);
 
-                var existingService = serviceCollection.FirstOrDefault(_ => _.ServiceType == lazyType);
+                var existingService = serviceCollection.FirstOrDefault(d => d.ServiceType == lazyType);
                 if (existingService != null)
                 {
                     serviceCollection.Remove(existingService);
@@ -53,7 +53,7 @@ internal static class ServiceCollectionLazySupportExtensions
     internal class InternalLazy<T> : Lazy<T>
     {
         public InternalLazy(IServiceProvider serviceProvider)
-            : base(() => serviceProvider.GetService<T>())
+            : base(serviceProvider.GetService<T>)
         {
 
         }
@@ -62,7 +62,7 @@ internal static class ServiceCollectionLazySupportExtensions
     internal class InternalEnumerableLazy<T> : Lazy<IEnumerable<T>>
     {
         public InternalEnumerableLazy(IServiceProvider serviceProvider)
-            : base(() => serviceProvider.GetServices<T>())
+            : base(serviceProvider.GetServices<T>)
         {
 
         }

@@ -38,7 +38,7 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                                                         Assembly                assembly)
     {
         var exportedTypes = assembly.GetExportedTypes()
-                                    .Where(_ => !_.IsAbstract && !_.IsInterface);
+                                    .Where(t => !t.IsAbstract && !t.IsInterface);
 
         var lifetime = ServiceLifetime.Scoped;
 
@@ -69,8 +69,8 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                     }
                     else
                     {
-                        var existingRegistration = serviceCollection.FirstOrDefault(_ => _.ServiceType == @interface &&
-                                                                                         _.ImplementationType ==
+                        var existingRegistration = serviceCollection.FirstOrDefault(d => d.ServiceType == @interface &&
+                                                                                         d.ImplementationType ==
                                                                                          dependencyType);
                         if (existingRegistration != null)
                             continue;
@@ -78,21 +78,22 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                         serviceCollection.Add(ServiceDescriptor.Describe(@interface,
                                                                          dependencyType,
                                                                          lifetime));
-                        // register the type itself
-                        serviceCollection.TryAdd(ServiceDescriptor.Describe(dependencyType,
-                                                                            dependencyType,
-                                                                            lifetime));
                     }
                 }
             }
+
+            // register the type itself
+            serviceCollection.TryAdd(ServiceDescriptor.Describe(dependencyType,
+                                                                dependencyType,
+                                                                lifetime));
         }
     }
 
     public static void ReplaceServiceLifetimeScope<TDependency>(this IServiceCollection serviceCollection,
                                                                 ServiceLifetime         lifetime)
     {
-        var serviceRegistrationsToReplace = serviceCollection.Where(_ => _.ServiceType == typeof(TDependency) &&
-                                                                         _.Lifetime != lifetime)
+        var serviceRegistrationsToReplace = serviceCollection.Where(d => d.ServiceType == typeof(TDependency) &&
+                                                                         d.Lifetime != lifetime)
                                                              .ToArray();
 
         foreach (var serviceRegistration in serviceRegistrationsToReplace)
@@ -140,8 +141,8 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                                                                    bool registerProvidedServiceType =
                                                                        false)
     {
-        var typesToRegister = dependencyTypes.Where(_ => _.IsSubclassOf(typeof(TDependency)) ||
-                                                         typeof(TDependency).IsAssignableFrom(_))
+        var typesToRegister = dependencyTypes.Where(t => t.IsSubclassOf(typeof(TDependency)) ||
+                                                         typeof(TDependency).IsAssignableFrom(t))
                                              .Distinct()
                                              .ToArray();
 
@@ -184,8 +185,8 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                     else
                     {
                         // find the existing registration
-                        var existingRegistration = serviceCollection.FirstOrDefault(_ => _.ServiceType == @interface &&
-                                                                                         _.ImplementationType ==
+                        var existingRegistration = serviceCollection.FirstOrDefault(d => d.ServiceType == @interface &&
+                                                                                         d.ImplementationType ==
                                                                                          dependencyType);
 
                         if (existingRegistration != null)
@@ -205,10 +206,6 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                         serviceCollection.Add(ServiceDescriptor.Describe(@interface,
                                                                          dependencyType,
                                                                          lifetime));
-                        // register the type itself
-                        serviceCollection.TryAdd(ServiceDescriptor.Describe(dependencyType,
-                                                                            dependencyType,
-                                                                            lifetime));
                     }
                 }
             }
@@ -228,12 +225,12 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                                                                      dependencyType,
                                                                      lifetime));
                 }
-
-                // register the type itself
-                serviceCollection.TryAdd(ServiceDescriptor.Describe(dependencyType,
-                                                                    dependencyType,
-                                                                    lifetime));
             }
+
+            // register the type itself
+            serviceCollection.TryAdd(ServiceDescriptor.Describe(dependencyType,
+                                                                dependencyType,
+                                                                lifetime));
         }
     }
 }

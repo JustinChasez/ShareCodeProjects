@@ -1,6 +1,8 @@
 ﻿// ReSharper disable once CheckNamespace
 
 #nullable enable
+using Microsoft.Extensions.DependencyInjection;
+
 namespace System;
 
 internal static class ServiceProviderExtensions
@@ -49,7 +51,7 @@ internal static class ServiceProviderExtensions
                                                  });
 
                     // all is ok, so create instance
-                    return Activator.CreateInstance(type, parameters.ToArray());
+                    return ActivatorUtilities.CreateInstance(provider, type, parameters.ToArray());
                 }
                 catch (Exception ex)
                 {
