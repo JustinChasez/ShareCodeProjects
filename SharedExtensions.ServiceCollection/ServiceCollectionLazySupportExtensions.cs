@@ -1,5 +1,7 @@
 ﻿// ReSharper disable once CheckNamespace
 
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 internal static class ServiceCollectionLazySupportExtensions
