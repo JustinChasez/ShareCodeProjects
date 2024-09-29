@@ -54,7 +54,8 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
             {
                 foreach (var @interface in interfaces)
                 {
-                    if (@interface.IsGenericType && dependencyType.IsGenericType)
+                    if (@interface.IsGenericType &&
+                        dependencyType.IsGenericType)
                     {
                         var interfaceGenericTypeDef  = @interface.GetGenericTypeDefinition();
                         var dependencyGenericTypeDef = dependencyType.GetGenericTypeDefinition();
@@ -67,11 +68,12 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                                                                             dependencyGenericTypeDef,
                                                                             lifetime));
                     }
-                    else
+                    else if (!dependencyType.IsGenericType)
                     {
                         var existingRegistration = serviceCollection.FirstOrDefault(d => d.ServiceType == @interface &&
                                                                                          d.ImplementationType ==
                                                                                          dependencyType);
+
                         if (existingRegistration != null)
                             continue;
 
@@ -158,8 +160,11 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                 var interfaces = dependencyType.GetInterfaces().ToArray();
 
                 // Get only direct parent interfaces
-                interfaces = interfaces.Except(interfaces.SelectMany(t => t.GetInterfaces()))
-                                       .ToArray();
+                interfaces = dependencyType.IsGenericType
+                                 ? interfaces.Except(interfaces.SelectMany(t => t.GetInterfaces().Where(t2 => !t2.IsGenericType)))
+                                             .ToArray()
+                                 : interfaces.Except(interfaces.SelectMany(t => t.GetInterfaces()))
+                                             .ToArray();
 
                 if (registerProvidedServiceType && !interfaces.Contains(typeof(TDependency)))
                 {
@@ -182,7 +187,7 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
                                                                             dependencyGenericTypeDef,
                                                                             lifetime));
                     }
-                    else
+                    else if (!dependencyType.IsGenericType)
                     {
                         // find the existing registration
                         var existingRegistration = serviceCollection.FirstOrDefault(d => d.ServiceType == @interface &&

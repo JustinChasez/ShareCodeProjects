@@ -8,9 +8,9 @@ namespace Microsoft.EntityFrameworkCore;
 /// </summary>
 /// <typeparam name="TDbContext">The type of the <see cref="DbContext"/> to migrate</typeparam>
 internal class AutoMigrateDbContextAtStartup<TDbContext>(
-    IServiceScopeFactory                               serviceScopeFactory,
-    ILogger<AutoMigrateDbContextAtStartup<TDbContext>> logger)
-    : MigrateDbContextAtStartup<TDbContext>(serviceScopeFactory, logger)
+    IServiceScopeFactory serviceScopeFactory,
+    ILoggerFactory       loggerFactory)
+    : MigrateDbContextAtStartup<TDbContext>(serviceScopeFactory, loggerFactory)
     where TDbContext : DbContext
 {
     protected override bool ShouldRun()

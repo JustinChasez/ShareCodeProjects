@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.EntityFrameworkCore;
 
 internal class AutoMigrateDbContextAfterAppStarted<TDbContext>(
-    IServiceScopeFactory                           serviceScopeFactory,
-    IHostApplicationLifetime                       lifetime,
-    ILogger<MigrateDbContextAtStartup<TDbContext>> logger)
-    : MigrateDbContextAtStartup<TDbContext>(serviceScopeFactory, logger)
+    IServiceScopeFactory     serviceScopeFactory,
+    IHostApplicationLifetime lifetime,
+    ILoggerFactory           loggerFactory)
+    : MigrateDbContextAtStartup<TDbContext>(serviceScopeFactory, loggerFactory)
     where TDbContext : DbContext
 {
     protected override bool ShouldRun()

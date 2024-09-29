@@ -8,13 +8,21 @@ namespace Microsoft.EntityFrameworkCore;
 ///     Represents the task to detect and migrate the given database context at startup
 /// </summary>
 /// <typeparam name="TDbContext">The type of the <see cref="DbContext"/> to migrate</typeparam>
-internal abstract class MigrateDbContextAtStartup<TDbContext>(
-    IServiceScopeFactory serviceScopeFactory,
-    ILogger              logger)
+internal abstract class MigrateDbContextAtStartup<TDbContext>
     : IHostedService
     where TDbContext : DbContext
 {
-    protected abstract bool ShouldRun();
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ILogger              _logger;
+
+    protected MigrateDbContextAtStartup(IServiceScopeFactory serviceScopeFactory,
+                                        ILoggerFactory       loggerFactory)
+    {
+        _serviceScopeFactory = serviceScopeFactory;
+        _logger              = loggerFactory.CreateLogger(GetType());
+    }
+
+    protected abstract bool                 ShouldRun();
 
     public virtual Task StartAsync(CancellationToken cancellationToken)
     {
@@ -28,11 +36,11 @@ internal abstract class MigrateDbContextAtStartup<TDbContext>(
 
     protected virtual void PerformMigration()
     {
-        using (var scope = serviceScopeFactory.CreateScope())
+        using (var scope = _serviceScopeFactory.CreateScope())
         {
             using (var dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>())
             {
-                dbContext.AutoMigrateDbSchema(logger);
+                dbContext.AutoMigrateDbSchema(_logger);
             }
         }
     }

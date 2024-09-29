@@ -8,6 +8,7 @@ internal static class ServiceCollectionLazySupportExtensions
 {
     public static IServiceCollection EnableLazyResolver(this IServiceCollection serviceCollection)
     {
+        serviceCollection.TryAddSingleton<IServiceCollection>(serviceCollection);
         var servicesByType = serviceCollection.GroupBy(s => s.ServiceType);
 
         foreach (var services in servicesByType)
