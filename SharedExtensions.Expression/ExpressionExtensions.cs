@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using DotNetBrightener.Framework.Exceptions;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
-using DotNetBrightener.Framework.Exceptions;
 
 namespace System.Linq.Expressions;
 
@@ -89,14 +89,14 @@ internal static class ExpressionExtensions
 
             if (memberExpression == null)
             {
-                return Array.Empty<PropertyInfo>();
+                return [];
             }
 
             var propertyInfo = memberExpression.Member as PropertyInfo;
 
             if (propertyInfo == null)
             {
-                return Array.Empty<PropertyInfo>();
+                return [];
             }
 
             propertyInfos.Insert(0, propertyInfo);
@@ -152,10 +152,39 @@ internal static class ExpressionExtensions
         return memberAccessExpression;
     }
 
+    public static Expression<Func<T, object>> BuildMemberAccessToStringExpression<T>(string fieldName) where T : class
+    {
+        var type      = typeof(T);
+        var fieldInfo = type.GetMember(fieldName).FirstOrDefault();
+
+        if (fieldInfo == null)
+        {
+            // Try PascalCase fallback
+            fieldName = fieldName.First().ToString().ToUpper() + fieldName.Substring(1);
+            fieldInfo = type.GetMember(fieldName).FirstOrDefault();
+        }
+
+        if (fieldInfo == null ||
+            fieldInfo is not PropertyInfo propertyInfo)
+            throw new UnknownPropertyException(fieldName, type);
+
+        var paramExpression = Expression.Parameter(type, "_");
+        var memberAccess    = Expression.MakeMemberAccess(paramExpression, propertyInfo);
+
+        // Build member.ToString()
+        var toStringCall = Expression.Call(memberAccess, typeof(object).GetMethod("ToString", Type.EmptyTypes)!);
+
+        // Box the result to object if necessary
+        Expression boxed = Expression.Convert(toStringCall, typeof(object));
+
+        return Expression.Lambda<Func<T, object>>(boxed, paramExpression);
+    }
+
+
     public static Expression<Func<T, T>> BuildMemberInitExpressionFromDto<T>(object dataTransferObject) where T : class
     {
         Type type                 = typeof(T);
-        var  newExpression        = Expression.New(type.GetConstructor(new Type[0]));
+        var  newExpression        = Expression.New(type.GetConstructor([]));
         var  memberAssignmentList = new List<MemberAssignment>();
 
         var jobject = JObject.FromObject(dataTransferObject);
@@ -268,10 +297,9 @@ internal static class ExpressionExtensions
     {
         var parameterExpression = Expression.Parameter(typeof(T), typeof(T).Name);
 
-        var properties = propertiesPath.Split(new[]
-                                              {
+        var properties = propertiesPath.Split([
                                                   "."
-                                              },
+                                              ],
                                               StringSplitOptions.RemoveEmptyEntries);
 
         return (Expression<Func<T, bool>>)BuildNavigationExpression(parameterExpression, comparer, value, properties);
@@ -312,10 +340,9 @@ internal static class ExpressionExtensions
     {
         var parameterExpression = Expression.Parameter(typeof(T), typeof(T).Name);
 
-        var properties = propertiesPath.Split(new[]
-                                              {
+        var properties = propertiesPath.Split([
                                                   "."
-                                              },
+                                              ],
                                               StringSplitOptions.RemoveEmptyEntries);
 
         return (Expression<Func<T, bool>>)BuildNavigationExpression(parameterExpression, comparer, value, properties);
