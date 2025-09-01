@@ -25,7 +25,7 @@ internal static class ReflectionExtensions
                                                       int          level         = 0)
     {
         if (recursiveList == null)
-            recursiveList = new List<string>();
+            recursiveList = [];
 
         if (level > 3)
             return recursiveList;
@@ -75,10 +75,9 @@ internal static class ReflectionExtensions
 
     public static Type[] GetDerivedTypes<TParent>(this Assembly assembly)
     {
-        return GetDerivedTypes(new[]
-                               {
+        return GetDerivedTypes([
                                    assembly
-                               },
+                               ],
                                typeof(TParent))
            .ToArray();
     }

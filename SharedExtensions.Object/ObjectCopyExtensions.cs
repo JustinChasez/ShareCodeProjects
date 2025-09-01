@@ -13,7 +13,7 @@ internal static class ObjectCopyExtensions
     {
         var ignoredPropertiesExpression = ignoredProperties != null
                                               ? ignoredProperties.GetSimplePropertyAccessList()
-                                              : Enumerable.Empty<PropertyInfo>();
+                                              : [];
 
 
         var sourceProperties = entityIn.GetType().GetProperties();
@@ -51,7 +51,7 @@ internal static class ObjectCopyExtensions
 
     public static object TryGetValue<T>(T model, string fromField, Type propertyType = null)
     {
-        var properties = fromField.Split(new[] {"."}, StringSplitOptions.RemoveEmptyEntries).Reverse().ToList();
+        var properties = fromField.Split(["."], StringSplitOptions.RemoveEmptyEntries).Reverse().ToList();
 
         var propertiesStack = new Stack<string>(properties);
 
@@ -85,7 +85,7 @@ internal static class ObjectCopyExtensions
 
     public static void TrySetValue<T>(T model, string toField, object value, Type propertyType = null)
     {
-        var properties = toField.Split(new[] {"."}, StringSplitOptions.RemoveEmptyEntries).Reverse().ToList();
+        var properties = toField.Split(["."], StringSplitOptions.RemoveEmptyEntries).Reverse().ToList();
 
         var propertiesStack = new Stack<string>(properties);
 

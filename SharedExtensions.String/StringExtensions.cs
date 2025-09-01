@@ -17,12 +17,11 @@ internal static class StringExtensions
     public static string[] SplitWithDefault(this string inputString)
     {
         if (string.IsNullOrEmpty(inputString))
-            return new string[] { };
+            return [];
 
-        return inputString.Split(new[]
-                                 {
+        return inputString.Split([
                                      ";", ","
-                                 },
+                                 ],
                                  StringSplitOptions.RemoveEmptyEntries);
     }
 
@@ -150,7 +149,7 @@ internal static class StringExtensions
     /// </returns>
     public static string ToCamelCase(this string str)
     {
-        var words = str.Split(new[] { "_", " " }, StringSplitOptions.RemoveEmptyEntries);
+        var words = str.Split(["_", " "], StringSplitOptions.RemoveEmptyEntries);
         var leadWord = Regex.Replace(words[0], @"([A-Z])([A-Z]+|[a-z0-9]+)($|[A-Z]\w*)",
                                      m => m.Groups[1].Value.ToLower() + m.Groups[2].Value.ToLower() + m.Groups[3].Value);
 

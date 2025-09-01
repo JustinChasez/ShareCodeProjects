@@ -168,7 +168,7 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
 
                 if (registerProvidedServiceType && !interfaces.Contains(typeof(TDependency)))
                 {
-                    interfaces = interfaces.Concat(new[] {typeof(TDependency)})
+                    interfaces = interfaces.Concat([typeof(TDependency)])
                                            .ToArray();
                 }
 
