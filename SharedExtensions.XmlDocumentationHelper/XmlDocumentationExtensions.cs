@@ -159,7 +159,7 @@ internal static class XmlDocumentationExtensions
         => GetXmlDocumentation(member, GetDocument(member.Module.Assembly, pathToXmlFile));
 
     /// <summary>
-    /// Returns the XML documentation (summary tag) for the specified member.
+    ///     Returns the XML documentation (summary tag) for the specified member.
     /// </summary> 
     /// <param name="member">The reflected member.</param>
     /// <param name="xml">XML documentation.</param>

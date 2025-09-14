@@ -31,7 +31,7 @@ internal static class StringExtensions
     }
 
     /// <summary>
-    /// Indicates whether this string is null or an System.String.Empty string.
+    ///     Indicates whether this string is null or an System.String.Empty string.
     /// </summary>
     public static bool IsNullOrEmpty(this string str)
     {
@@ -39,7 +39,7 @@ internal static class StringExtensions
     }
 
     /// <summary>
-    /// indicates whether this string is null, empty, or consists only of white-space characters.
+    ///     indicates whether this string is null, empty, or consists only of white-space characters.
     /// </summary>
     public static bool IsNullOrWhiteSpace(this string str)
     {

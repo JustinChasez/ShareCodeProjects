@@ -122,7 +122,7 @@ internal static class ServiceCollectionAutoRegisterDependenciesExtension
     }
 
     /// <summary>
-    /// Detects and registers the implementation services that implement <typeparamref name="TDependency"/> service type 
+    ///     Detects and registers the implementation services that implement <typeparamref name="TDependency"/> service type 
     /// </summary>
     /// <typeparam name="TDependency">The service type to register</typeparam>
     /// <param name="serviceCollection">The <see cref="IServiceCollection"/></param>
